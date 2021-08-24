@@ -1,0 +1,6 @@
+package com.NossaRadio.nossaRadio
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
