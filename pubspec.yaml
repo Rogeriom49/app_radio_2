@@ -36,6 +36,7 @@ dependencies:
   just_audio: ^0.9.7
   flutter_native_splash: ^1.1.8+4
   google_fonts: ^2.1.0
+  audio_service: ^0.17.1
 
 flutter_native_splash:
   background_image: "assets/img/MobilePlayerHome.png"

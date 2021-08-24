@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -149,7 +150,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _player.dispose();
+    await _player.dispose();
     super.dispose();
   }
   
