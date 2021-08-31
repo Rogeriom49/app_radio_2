@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,8 +9,20 @@ import 'package:rxdart/rxdart.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:flutter_radio_6/common.dart';
 
-void main() => runApp(MyApp());
+// void main() => runApp(MyApp());
+
+Future<void> main() async {
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: false,
+  );
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -19,6 +30,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  static int _nextMediaId = 0;
   late AudioPlayer _player;
   final _playlist = ConcatenatingAudioSource(children: [
     // ClippingAudioSource(
@@ -36,89 +48,81 @@ class _MyAppState extends State<MyApp> {
     //     wpp: "",     
     //   ),
     // ),
-      AudioSource.uri(
-      Uri.parse(
-          "http://audio8.cmaudioevideo.com:8193/stream"),
-      tag: AudioMetadata(
-        album: "Rede Nossa Rádio",
-        title: "Mundo Agro",
-        artwork:
-            "https://i.imgur.com/r9SNHJr.png",
-        wpp:"",
-      ),
-    ),
-
     AudioSource.uri(
       Uri.parse(
           "http://audio8.cmaudioevideo.com:8247/stream"),
-      tag: AudioMetadata(
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
         album: "Rede Nossa Rádio",
         title: "Entre-Ijuis 90.7",
-        artwork:
-            "https://i.imgur.com/ZhfmMet.png",
-        wpp:"https://api.whatsapp.com/send?phone=555533291263",
+        artUri: Uri.parse("https://i.imgur.com/ZhfmMet.png"),
       ),
     ),
     AudioSource.uri(
       Uri.parse("http://audio8.cmaudioevideo.com:8241/stream"),
-      tag: AudioMetadata(
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
         album: "Rede Nossa Rádio",
         title: "Horizontina 95.7",
-        artwork:
-            "https://i.imgur.com/rnZlCOG.png",
-        wpp: "https://api.whatsapp.com/send?phone=555535373440",
+        artUri: Uri.parse("https://i.imgur.com/rnZlCOG.png"),
       ),
     ),
     AudioSource.uri(
       Uri.parse("http://audio8.cmaudioevideo.com:8187/stream"),
-      tag: AudioMetadata(
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
         album: "Rede Nossa Rádio",
         title: "Caibi 96.7",
-        artwork:
-            "https://i.imgur.com/GvQc49b.png",
-        wpp: "https://api.whatsapp.com/send?phone=554936480233",
+        artUri: Uri.parse("https://i.imgur.com/GvQc49b.png"),
       ),
     ),
         AudioSource.uri(
       Uri.parse("http://audio8.cmaudioevideo.com:8207/stream"),
-      tag: AudioMetadata(
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
         album: "Rede Nossa Rádio",
         title: "Passos Maia 100.7",
-        artwork:
-            "https://i.imgur.com/Ac2MCF6.png",
-        wpp: "https://api.whatsapp.com/send?phone=554934351007", 
+        artUri: Uri.parse("https://i.imgur.com/Ac2MCF6.png"),
       ),
     ),
         AudioSource.uri(
       Uri.parse("http://audio8.cmaudioevideo.com:8092/stream"),
-      tag: AudioMetadata(
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
         album: "Rede Nossa Rádio",
         title: "Palmitos 101.5",
-        artwork:
-            "https://i.imgur.com/33QlUsU.png",
-        wpp: "https://api.whatsapp.com/send?phone=554936470707",
+        artUri: Uri.parse("https://i.imgur.com/33QlUsU.png"),
       ),
     ),
         AudioSource.uri(
       Uri.parse("http://audio8.cmaudioevideo.com:8141/stream"),
-      tag: AudioMetadata(
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
         album: "Rede Nossa Rádio",
         title: "São Carlos 104.1",
-        artwork:
-            "https://i.imgur.com/DzrTwiY.png",
-        wpp: "https://api.whatsapp.com/send?phone=554933254355",
+        artUri: Uri.parse("https://i.imgur.com/DzrTwiY.png"),
       ),
     ),
         AudioSource.uri(
       Uri.parse("http://audio8.cmaudioevideo.com:8181/stream"),
-      tag: AudioMetadata(
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
         album: "Rede Nossa Rádio",
         title: "Irineópolis 105.9",
-        artwork:
-            "https://i.imgur.com/BdZpDhU.png",
-        wpp: "https://api.whatsapp.com/send?phone=554736251406",
+        artUri: Uri.parse("https://i.imgur.com/BdZpDhU.png"),
       ),
     ),
+        AudioSource.uri(
+      Uri.parse(
+          "http://audio8.cmaudioevideo.com:8193/stream"),
+      tag: MediaItem(
+        id: '${_nextMediaId++}',
+        album: "Rede Nossa Rádio",
+        title: "Mundo Agro",
+        artUri: Uri.parse("https://i.imgur.com/r9SNHJr.png"),
+      ),
+    ),
+
   ]);
   int _addedCount = 0;
 
@@ -150,13 +154,22 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    await _player.dispose();
+    _player.dispose();
     super.dispose();
   }
-  
 
+  // Stream<PositionData> get _positionDataStream =>
+  //   Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
+  //       _player.positionStream,
+  //       _player.bufferedPositionStream,
+  //       _player.durationStream,
+  //       (position, bufferedPosition, duration) => PositionData(
+  //           position, bufferedPosition, duration ?? Duration.zero));
+  
   @override
   Widget build(BuildContext context) {
+    final urlW = ['https://api.whatsapp.com/send?phone=555533291263', 'https://api.whatsapp.com/send?phone=555535373440', 'https://api.whatsapp.com/send?phone=554936480233', 'https://api.whatsapp.com/send?phone=554934351007', 'https://api.whatsapp.com/send?phone=554936470707', 'https://api.whatsapp.com/send?phone=554933254355', 'https://api.whatsapp.com/send?phone=554736251406', 'https://api.whatsapp.com/send?phone=554936470707'];
+    
     return new WillPopScope(
       onWillPop: () async => false, 
       child: new MaterialApp(
@@ -177,7 +190,7 @@ class _MyAppState extends State<MyApp> {
                   builder: (context, snapshot) {
                     final state = snapshot.data;
                     if (state?.sequence.isEmpty ?? true) return SizedBox();
-                    final metadata = state!.currentSource!.tag as AudioMetadata;
+                    final metadata = state!.currentSource!.tag as MediaItem;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -186,7 +199,7 @@ class _MyAppState extends State<MyApp> {
                             padding: const EdgeInsets.all(8.0),
                             child:
                                 Center(
-                                  child: Image.network(metadata.artwork,
+                                  child: Image.network(metadata.artUri.toString(),
                                         scale: 1.5,   
                                   ),
                                 ),
@@ -201,35 +214,17 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
               ControlButtons(_player),
-              // StreamBuilder<Duration?>(
-              //   stream: _player.durationStream,
+              // StreamBuilder<PositionData>(
+              //   stream: _positionDataStream,
               //   builder: (context, snapshot) {
-              //     final duration = snapshot.data ?? Duration.zero;
-              //     return StreamBuilder<PositionData>(
-              //       stream: Rx.combineLatest2<Duration, Duration, PositionData>(
-              //           _player.positionStream,
-              //           _player.bufferedPositionStream,
-              //           (position, bufferedPosition) =>
-              //               PositionData(position, bufferedPosition)),
-              //       builder: (context, snapshot) {
-              //         final positionData = snapshot.data ??
-              //             PositionData(Duration.zero, Duration.zero);
-              //         var position = positionData.position;
-              //         if (position > duration) {
-              //           position = duration;
-              //         }
-              //         var bufferedPosition = positionData.bufferedPosition;
-              //         if (bufferedPosition > duration) {
-              //           bufferedPosition = duration;
-              //         }
-              //         return SeekBar(
-              //           duration: duration,
-              //           position: position,
-              //           bufferedPosition: bufferedPosition,
-              //           onChangeEnd: (newPosition) {
-              //             _player.seek(newPosition);
-              //           },
-              //         );
+              //     final positionData = snapshot.data;
+              //     return SeekBar(
+              //       duration: positionData?.duration ?? Duration.zero,
+              //       position: positionData?.position ?? Duration.zero,
+              //       bufferedPosition:
+              //           positionData?.bufferedPosition ?? Duration.zero,
+              //       onChangeEnd: (newPosition) {
+              //         _player.seek(newPosition);
               //       },
               //     );
               //   },
@@ -246,9 +241,10 @@ class _MyAppState extends State<MyApp> {
                 child: StreamBuilder<SequenceState?>(
                   stream: _player.sequenceStateStream,
                   builder: (context, snapshot) {
+                    if(!snapshot.hasData) return SizedBox();
                     final state = snapshot.data;
                     final sequence = state?.sequence ?? [];
-                    final metadata = state!.currentSource!.tag as AudioMetadata; 
+                    final metadata = state!.currentSource!.tag as MediaItem; 
                     return ListView(
                       children: [
                         for (var i = 0; i < sequence.length; i++)
@@ -275,7 +271,7 @@ class _MyAppState extends State<MyApp> {
                                    side: BorderSide(
                                      color: i == state.currentIndex
                                           ? Colors.yellow
-                                          : Colors.transparent,
+                                          : Colors.white,
                                      width: 1.0,
                                    ),
                                 ),
@@ -319,26 +315,25 @@ class _MyAppState extends State<MyApp> {
                                     color: i == state.currentIndex
                                           ? Colors.yellow
                                           : Colors.white,), 
-                                    onPressed: () async => await launch(sequence[i].tag.wpp as String)
-                                    )
-                                  ],
+                                    onPressed: () async => await launch(urlW[i])
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
-    
   }
 }
 
@@ -583,9 +578,10 @@ class AudioMetadata {
   final String title;
   final String artwork;
   final String wpp;
+  final String id;
 
   AudioMetadata(
-      {required this.album, required this.title, required this.artwork, required this.wpp});
+      {required this.album, required this.title, required this.artwork, required this.wpp, required this.id});
 }
 
 class HiddenThumbComponentShape extends SliderComponentShape {
